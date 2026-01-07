@@ -225,8 +225,8 @@ with countdown_col4:
 # Auto-refresh every second using JavaScript
 st.markdown("""
 <script>
-    const refreshCountdown = setInterval(function() {
-        // Refresh the page every second
+    // Auto-refresh page every second for real-time countdown
+    setInterval(function() {
         location.reload();
     }, 1000);
 </script>
@@ -244,16 +244,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Gallery placeholder with image upload
-st.markdown("""
-<div style="background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%); 
-            border: 3px dashed #ff69b4; border-radius: 15px; 
-            padding: 40px; text-align: center; min-height: 300px;">
-    <h3 style="color: #ff1493; margin-bottom: 20px;">📷 Photo Gallery</h3>
-    <p style="color: #ff69b4; font-size: 1.1em;">Gallery placeholder - Add your favorite photos here!</p>
-</div>
-""", unsafe_allow_html=True)
-
 # Image upload option
 uploaded_files = st.file_uploader(
     "Upload photos to the gallery",
@@ -268,30 +258,33 @@ if uploaded_files:
             st.session_state.gallery_images.append(uploaded_file)
     st.success(f"✅ {len(uploaded_files)} photo(s) uploaded to the gallery!")
 
-# Display gallery images
-if st.session_state.gallery_images:
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%); 
-                border: 3px solid #ff69b4; border-radius: 15px; 
-                padding: 20px; text-align: center; min-height: 300px;">
-        <h3 style="color: #ff1493; margin-bottom: 20px;">📷 Photo Gallery</h3>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Display images in gallery
-    cols = st.columns(min(3, len(st.session_state.gallery_images)))
-    for idx, image_file in enumerate(st.session_state.gallery_images):
-        with cols[idx % len(cols)]:
-            st.image(image_file, use_column_width=True)
-else:
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%); 
-                border: 3px dashed #ff69b4; border-radius: 15px; 
-                padding: 40px; text-align: center; min-height: 300px;">
-        <h3 style="color: #ff1493; margin-bottom: 20px;">📷 Photo Gallery</h3>
-        <p style="color: #ff69b4; font-size: 1.1em;">📸 Upload your favorite photos here!</p>
-    </div>
-    """, unsafe_allow_html=True)
+# Display gallery images in a single container
+gallery_container = st.container()
+
+with gallery_container:
+    if st.session_state.gallery_images:
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%); 
+                    border: 3px solid #ff69b4; border-radius: 15px; 
+                    padding: 20px; text-align: center; margin-bottom: 20px;">
+            <h3 style="color: #ff1493; margin-bottom: 20px;">📷 Photo Gallery</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Display images in gallery in 3 columns
+        cols = st.columns(min(3, len(st.session_state.gallery_images)))
+        for idx, image_file in enumerate(st.session_state.gallery_images):
+            with cols[idx % len(cols)]:
+                st.image(image_file, use_column_width=True)
+    else:
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%); 
+                    border: 3px dashed #ff69b4; border-radius: 15px; 
+                    padding: 40px; text-align: center; min-height: 300px;">
+            <h3 style="color: #ff1493; margin-bottom: 20px;">📷 Photo Gallery</h3>
+            <p style="color: #ff69b4; font-size: 1.1em;">📸 Upload your favorite photos here!</p>
+        </div>
+        """, unsafe_allow_html=True)
     
 st.markdown("<br>", unsafe_allow_html=True)
 
