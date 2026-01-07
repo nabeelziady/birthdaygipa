@@ -13,14 +13,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Configure auto-rerun
-st.set_page_config(
-    page_title="🎂 Happy Birthday! 🎂",
-    page_icon="🎉",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
-
 # Initialize session state for wishes
 if 'wishes' not in st.session_state:
     st.session_state.wishes = []
