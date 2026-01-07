@@ -4,6 +4,10 @@ import time
 from datetime import datetime as dt, timezone, timedelta
 import math
 import pytz
+from streamlit_autorefresh import st_autorefresh
+
+# Refresh page every 1000 ms (1 second)
+st_autorefresh(interval=1000, key="countdown_refresh")
 
 # Set page config
 st.set_page_config(
