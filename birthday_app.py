@@ -207,11 +207,11 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.markdown("""
     <div class="main-title">
-        🎉 Happy Birthday To My Love ❤️ 🎉
+        🎉 Happy Birthday Buyub <3 🎉
     </div>
     """, unsafe_allow_html=True)
 
-st.markdown('<div class="countdown-title">⏰ Countdown to Your Special Day ⏰</div>', unsafe_allow_html=True)
+st.markdown("<div class='countdown-title'>⏰ Countdown to Buyub's Day ⏰</div>", unsafe_allow_html=True)
 
 def get_countdown():
     # Set timezone to WIB (Jakarta)
@@ -308,7 +308,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 # Large empty box for special section
 st.markdown("""
 <div class="special-box">
-    <h2>💐 Special Moment For Us 💐</h2>
+    <h2>BUYUUUUBBBBBBBBB HHHAAAAPPPYYYY BIRTHDAAYYYYY HIHIWHWIIWHWIHW, sudah menginjak kepala 2 nich hihihi my noona, buyuwi sudah melalui banyak hal yang menyenangkan, menyedihkan, melelahkan, yang membuat buyub belajar banyak sekali hal sampai akhirnya buyub di titik ini menjadi seorang wanita yang hebat, kuat, dan cantik nan imup hihi. Tentunya atu nda akan berhenti ngedoain kamu dan ucapan doa yang akan aku sampaikan setelah ini selalu kuulangi tiap harinya. BUYUUBBB kamu harus sehat selalu, selalu dilindungi, makin hebat dan makin kuat, teruslah bertahan dengan hebat karna kita punya tujuan arisusagi yang kita dambakan itu hihi, dan ketika tujuan itu tercapai pun masih banyak kehidupan yang akan kita jalani, dan tentunya kita akan selalu bersama. Atu selalu bangga dengan semua hal yang kamu lakukan bahkan sekecil apapun itu, you deserve semua kebahagiaan yang ada di dunia ini and you should be grateful for that! Perjalanan kita masih panjang dan masih banyak rintangan yang perlu kita lalui, meski begitu kita akan hadapi itu semua bersama-sama okayyyy!!! always and always, IIIWUUUBBUUUUSOOMAMESTTT BUYIBBBBB <3</h2>
 </div>
 """, unsafe_allow_html=True)
 
@@ -379,13 +379,7 @@ with tab1:
     
     if st.button("🎁 Open Surprise Box", use_container_width=True, key="surprise_btn"):
         surprises = [
-            "💕 You make every day special just by being you!",
-            "🌹 I love you more with each passing day!",
-            "🎂 Thank you for being the best part of my life!",
-            "✨ You are my greatest blessing!",
-            "🎵 Our love story is my favorite song!",
-            "🌟 You complete me perfectly!",
-            "💑 Forever with you sounds like a dream come true!"
+            "💕 Ikan hiu makan tomat, i wub yu so mad!",
         ]
         import random
         surprise = random.choice(surprises)
@@ -408,13 +402,13 @@ with tab2:
     
     if love_level >= 80:
         color = "#ff1493"
-        emoji = "🔥❤️🔥"
+        emoji = "Hayu nikah sekarang juga"
     elif love_level >= 60:
         color = "#ff69b4"
-        emoji = "💕💕"
+        emoji = "Tetep nikah sekarang juga"
     else:
         color = "#ffb6d9"
-        emoji = "💖"
+        emoji = "Ya tetep nikah sekarang juga lah hehe"
     
     st.markdown(f"""
     <div style="text-align: center; padding: 30px; background: rgba(255, 255, 255, 0.5); border-radius: 20px; backdrop-filter: blur(10px);">
@@ -431,8 +425,8 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 # Footer
 st.markdown("""
 <div class="footer">
-    <p style="font-size: 1.5em; margin-bottom: 10px;">💐 With all my love ❤️ 💐</p>
-    <p>Made with 💕 for your special day</p>
+    <p style="font-size: 1.5em; margin-bottom: 10px;">💐 With love ❤️ 💐</p>
+    <p>Made by Nabo husbando Gibo<3</p>
     <p style="font-size: 0.95em; color: #ff69b4; margin-top: 10px;">January 8, 2026 🎂</p>
 </div>
 """, unsafe_allow_html=True)
