@@ -515,7 +515,7 @@ with tab1:
     
     if st.button("🎁 Open Surprise Box", use_container_width=True, key="surprise_btn"):
         surprises = [
-            "💕 Ikan hiu makan tomat, i wub yu so mad!",
+            "💕 Ikan hiu makan nasi rames, i wub yu the mamest!",
         ]
         import random
         surprise = random.choice(surprises)
