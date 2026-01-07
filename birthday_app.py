@@ -12,6 +12,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# Initialize session state for wishes
+if 'wishes' not in st.session_state:
+    st.session_state.wishes = []
+
 # Custom CSS with pink theme
 pink_theme = """
 <style>
@@ -43,12 +47,6 @@ pink_theme = """
         font-weight: bold;
         text-shadow: 2px 2px 4px rgba(255, 105, 180, 0.3);
         margin: 20px 0;
-        animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
     }
     
     .countdown-container {
@@ -159,18 +157,30 @@ with col2:
     </div>
     """, unsafe_allow_html=True)
 
-# Countdown Timer
+# Auto-refresh the page every second for real-time countdown
+placeholder = st.empty()
+
+def get_countdown():
+    target_date = dt(2026, 1, 8, 0, 0, 0)
+    now = dt.now()
+    
+    # If birthday has passed, reset to next year
+    if now >= target_date:
+        target_date = dt(2027, 1, 8, 0, 0, 0)
+    
+    time_diff = target_date - now
+    
+    days = time_diff.days
+    hours = time_diff.seconds // 3600
+    minutes = (time_diff.seconds % 3600) // 60
+    seconds = time_diff.seconds % 60
+    
+    return days, hours, minutes, seconds
+
+# Countdown Timer with real-time refresh
 st.markdown('<div class="countdown-title">⏰ Countdown to Your Special Day ⏰</div>', unsafe_allow_html=True)
 
-# Calculate countdown
-target_date = dt(2026, 1, 8, 0, 0, 0)
-now = dt.now()
-time_diff = target_date - now
-
-days = time_diff.days
-hours = time_diff.seconds // 3600
-minutes = (time_diff.seconds % 3600) // 60
-seconds = time_diff.seconds % 60
+days, hours, minutes, seconds = get_countdown()
 
 # Create countdown display
 countdown_col1, countdown_col2, countdown_col3, countdown_col4 = st.columns(4)
@@ -218,36 +228,37 @@ st.markdown("""
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Section: Special Features
-st.markdown('<div class="section-header">✨ Celebrate With Me ✨</div>', unsafe_allow_html=True)
+# Section: Special Features - Gallery Only
+st.markdown('<div class="section-header">✨ Memory Gallery ✨</div>', unsafe_allow_html=True)
 
-# Features Grid
-feature1, feature2, feature3 = st.columns(3)
+st.markdown("""
+<div class="feature-card" style="text-align: center;">
+    <div class="feature-title">📸 Our Beautiful Memories 📸</div>
+    <p style="color: #666; margin-bottom: 20px;">Share and view our precious moments together!</p>
+</div>
+""", unsafe_allow_html=True)
 
-with feature1:
-    st.markdown("""
-    <div class="feature-card">
-        <div class="feature-title">🎂 Special Wishes</div>
-        <p>Leave your heartfelt message and birthday wishes that will be displayed on the celebration wall!</p>
-    </div>
-    """, unsafe_allow_html=True)
+# Gallery placeholder with image upload
+st.markdown("""
+<div style="background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%); 
+            border: 3px dashed #ff69b4; border-radius: 15px; 
+            padding: 40px; text-align: center; min-height: 300px;">
+    <h3 style="color: #ff1493; margin-bottom: 20px;">📷 Photo Gallery</h3>
+    <p style="color: #ff69b4; font-size: 1.1em;">Gallery placeholder - Add your favorite photos here!</p>
+</div>
+""", unsafe_allow_html=True)
 
-with feature2:
-    st.markdown("""
-    <div class="feature-card">
-        <div class="feature-title">🎵 Love Songs</div>
-        <p>Listen to a curated playlist of romantic songs to celebrate this special day together!</p>
-    </div>
-    """, unsafe_allow_html=True)
+# Image upload option
+uploaded_files = st.file_uploader(
+    "Upload photos to the gallery",
+    type=['jpg', 'jpeg', 'png', 'gif'],
+    accept_multiple_files=True,
+    key="gallery_upload"
+)
 
-with feature3:
-    st.markdown("""
-    <div class="feature-card">
-        <div class="feature-title">📸 Memory Gallery</div>
-        <p>Share and view beautiful memories and moments we've shared together!</p>
-    </div>
-    """, unsafe_allow_html=True)
-
+if uploaded_files:
+    st.success(f"✅ {len(uploaded_files)} photo(s) uploaded to the gallery!")
+    
 st.markdown("<br>", unsafe_allow_html=True)
 
 # Section: Birthday Wishes Wall
@@ -275,21 +286,31 @@ if submit_wish and wish_message:
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("""
 <div style="background: white; padding: 20px; border-radius: 10px; border-left: 5px solid #ff69b4;">
-    <h3 style="color: #ff1493;">Recent Wishes:</h3>
-    <p style="color: #666; font-style: italic;">💕 Happy birthday to my wonderful love! May this day bring you all the happiness you deserve!</p>
-    <hr style="border: 1px solid #ffb6d9;">
-    <p style="color: #666; font-style: italic;">❤️ Wishing you a year filled with love, joy, and beautiful moments together!</p>
-    <hr style="border: 1px solid #ffb6d9;">
-    <p style="color: #666; font-style: italic;">🎂 To my special someone - may your day be as beautiful as you are!</p>
+    <h3 style="color: #ff1493;">💌 Recent Wishes:</h3>
 </div>
 """, unsafe_allow_html=True)
+
+# Display submitted wishes
+if st.session_state.wishes:
+    for wish in reversed(st.session_state.wishes):
+        st.markdown(f"""
+        <div style="background: #fff0f5; padding: 15px; margin: 10px 0; border-radius: 10px; border-left: 5px solid #ff69b4;">
+            <p style="color: #666; font-style: italic;">💕 {wish}</p>
+        </div>
+        """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+    <div style="background: #fff0f5; padding: 20px; border-radius: 10px; text-align: center;">
+        <p style="color: #ffb6d9; font-style: italic;">✨ No wishes yet. Be the first to send your love! ✨</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
 # Section: Fun Activities
 st.markdown('<div class="section-header">🎉 Fun Activities 🎉</div>', unsafe_allow_html=True)
 
-tab1, tab2, tab3 = st.tabs(["💝 Surprise Box", "🎨 Love Meter", "🎪 Fun Facts"])
+tab1, tab2 = st.tabs(["💝 Surprise Box", "🎨 Love Meter"])
 
 with tab1:
     st.markdown("""
@@ -345,29 +366,6 @@ with tab2:
         <p style="color: #ff1493; font-size: 1.5em; font-weight: bold;">
             Love Level: <span style="color: {color};">{love_level}%</span>
         </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-with tab3:
-    st.markdown("""
-    <div style="padding: 20px;">
-        <h3 style="color: #ff1493;">Fun Love Facts! 💝</h3>
-        
-        <div style="background: #fff0f5; padding: 15px; margin: 10px 0; border-radius: 10px; border-left: 5px solid #ff69b4;">
-            <p><strong>💡 Fact #1:</strong> When you're in love, your brain releases the same chemicals as when you're happy - dopamine and serotonin!</p>
-        </div>
-        
-        <div style="background: #fff0f5; padding: 15px; margin: 10px 0; border-radius: 10px; border-left: 5px solid #ff69b4;">
-            <p><strong>💡 Fact #2:</strong> Making eye contact for 10 minutes can create a feeling of intense love and connection!</p>
-        </div>
-        
-        <div style="background: #fff0f5; padding: 15px; margin: 10px 0; border-radius: 10px; border-left: 5px solid #ff69b4;">
-            <p><strong>💡 Fact #3:</strong> Holding hands reduces pain and stress. It literally heals! 💕</p>
-        </div>
-        
-        <div style="background: #fff0f5; padding: 15px; margin: 10px 0; border-radius: 10px; border-left: 5px solid #ff69b4;">
-            <p><strong>💡 Fact #4:</strong> The heart emoji ❤️ is the most used emoji in the world!</p>
-        </div>
     </div>
     """, unsafe_allow_html=True)
 
