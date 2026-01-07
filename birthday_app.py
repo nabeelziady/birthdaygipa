@@ -5,6 +5,8 @@ from datetime import datetime as dt, timezone, timedelta
 import math
 import pytz
 from streamlit_autorefresh import st_autorefresh
+import json
+import os
 
 # Set page config
 st.set_page_config(
@@ -17,12 +19,31 @@ st.set_page_config(
 # Refresh page every 1000 ms (1 second)
 st_autorefresh(interval=1000, key="countdown_refresh")
 
-# Initialize session state for wishes
-if 'wishes' not in st.session_state:
-    st.session_state.wishes = []
+# Database file untuk menyimpan wishes
+WISHES_DB_FILE = "wishes_database.json"
 
-if 'gallery_text' not in st.session_state:
-    st.session_state.gallery_text = ""
+def load_wishes_from_db():
+    """Load wishes dari database file"""
+    if os.path.exists(WISHES_DB_FILE):
+        try:
+            with open(WISHES_DB_FILE, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data.get('wishes', [])
+        except:
+            return []
+    return []
+
+def save_wishes_to_db(wishes):
+    """Save wishes ke database file"""
+    try:
+        with open(WISHES_DB_FILE, 'w', encoding='utf-8') as f:
+            json.dump({'wishes': wishes}, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        st.error(f"Error saving wishes: {e}")
+
+# Initialize session state for wishes from database
+if 'wishes' not in st.session_state:
+    st.session_state.wishes = load_wishes_from_db()
 
 # Custom CSS with pink theme
 pink_theme = """
@@ -160,7 +181,7 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.markdown("""
     <div class="main-title">
-        🎉Happy Birthday Buyub ❤️
+        🎉 Happy Birthday Buyub! ❤️ 🎉
     </div>
     """, unsafe_allow_html=True)
 
@@ -268,53 +289,57 @@ st.markdown("""
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Section: Special Features - Gallery Text Box
-st.markdown('<div class="section-header">📝 Special Notes & Memories 📝</div>', unsafe_allow_html=True)
+# Section: Special Features - Gallery Only
+st.markdown('<div class="section-header">✨ Memory Gallery ✨</div>', unsafe_allow_html=True)
 
 st.markdown("""
 <div class="feature-card" style="text-align: center;">
-    <div class="feature-title">💭 Write Your Thoughts & Memories 💭</div>
-    <p style="color: #666; margin-bottom: 20px;">Share special moments and beautiful memories in text form!</p>
+    <div class="feature-title">� Our Beautiful Memories �</div>
+    <p style="color: #666; margin-bottom: 20px;">Share and view our precious moments together!</p>
 </div>
 """, unsafe_allow_html=True)
 
-# Text input for gallery
-gallery_text_input = st.text_area(
-    "📝 Write your special notes, memories, or messages:",
-    placeholder="Share your beautiful memories, favorite moments, or heartfelt messages here...",
-    height=200,
-    key="gallery_text_input"
+# Image upload option
+uploaded_files = st.file_uploader(
+    "Upload photos to the gallery",
+    type=['jpg', 'jpeg', 'png', 'gif'],
+    accept_multiple_files=True,
+    key="gallery_upload"
 )
 
-# Save button for gallery text
-col_save1, col_save2 = st.columns([2, 1])
-with col_save2:
-    if st.button("💾 Save Note", use_container_width=True, key="save_gallery_note"):
-        if gallery_text_input:
-            st.session_state.gallery_text = gallery_text_input
-            st.success("💕 Your note has been saved!")
+if uploaded_files:
+    for uploaded_file in uploaded_files:
+        if uploaded_file not in st.session_state.gallery_images:
+            st.session_state.gallery_images.append(uploaded_file)
+    st.success(f"✅ {len(uploaded_files)} photo(s) uploaded to the gallery!")
 
-# Display gallery text in container
-st.markdown("""
-<div style="background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%); 
-            border: 3px solid #ff69b4; border-radius: 15px; 
-            padding: 20px; margin-top: 20px; margin-bottom: 20px;">
-    <h3 style="color: #ff1493; margin-bottom: 20px;">✨ Saved Memories ✨</h3>
-</div>
-""", unsafe_allow_html=True)
+# Display gallery images in a single container
+gallery_container = st.container()
 
-if st.session_state.gallery_text:
-    st.markdown(f"""
-    <div style="background: white; padding: 20px; border-radius: 10px; border-left: 5px solid #ff69b4; margin-bottom: 20px;">
-        <p style="color: #333; line-height: 1.8; font-size: 1.1em; white-space: pre-wrap;">{st.session_state.gallery_text}</p>
-    </div>
-    """, unsafe_allow_html=True)
-else:
-    st.markdown("""
-    <div style="background: white; padding: 30px; border-radius: 10px; text-align: center; min-height: 200px; display: flex; align-items: center; justify-content: center;">
-        <p style="color: #ffb6d9; font-style: italic;">✨ Write and save your beautiful memories here! ✨</p>
-    </div>
-    """, unsafe_allow_html=True)
+with gallery_container:
+    if st.session_state.gallery_images:
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%); 
+                    border: 3px solid #ff69b4; border-radius: 15px; 
+                    padding: 20px; text-align: center; margin-bottom: 20px;">
+            <h3 style="color: #ff1493; margin-bottom: 20px;">📷 Photo Gallery</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Display images in gallery in 3 columns
+        cols = st.columns(min(3, len(st.session_state.gallery_images)))
+        for idx, image_file in enumerate(st.session_state.gallery_images):
+            with cols[idx % len(cols)]:
+                st.image(image_file, use_column_width=True)
+    else:
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%); 
+                    border: 3px dashed #ff69b4; border-radius: 15px; 
+                    padding: 40px; text-align: center; min-height: 300px;">
+            <h3 style="color: #ff1493; margin-bottom: 20px;">📷 Photo Gallery</h3>
+            <p style="color: #ff69b4; font-size: 1.1em;">📸 Upload your favorite photos here!</p>
+        </div>
+        """, unsafe_allow_html=True)
     
 st.markdown("<br>", unsafe_allow_html=True)
 
