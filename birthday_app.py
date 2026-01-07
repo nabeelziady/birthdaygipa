@@ -13,6 +13,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# Configure auto-rerun
+st.set_page_config(
+    page_title="🎂 Happy Birthday! 🎂",
+    page_icon="🎉",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
 # Initialize session state for wishes
 if 'wishes' not in st.session_state:
     st.session_state.wishes = []
@@ -185,50 +193,80 @@ def get_countdown():
 # Countdown Timer with real-time refresh
 st.markdown('<div class="countdown-title">⏰ Countdown to Your Special Day ⏰</div>', unsafe_allow_html=True)
 
-# Display countdown with auto-refresh using Streamlit's built-in rerun
-days, hours, minutes, seconds = get_countdown()
+# Create placeholders for countdown display
+countdown_placeholder = st.empty()
 
-countdown_col1, countdown_col2, countdown_col3, countdown_col4 = st.columns(4)
+def display_countdown():
+    days, hours, minutes, seconds = get_countdown()
+    
+    countdown_col1, countdown_col2, countdown_col3, countdown_col4 = st.columns(4)
+    
+    with countdown_col1:
+        st.markdown(f"""
+        <div class="time-unit">
+            <div class="time-number">{days}</div>
+            <div class="time-label">Days</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with countdown_col2:
+        st.markdown(f"""
+        <div class="time-unit">
+            <div class="time-number">{hours:02d}</div>
+            <div class="time-label">Hours</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with countdown_col3:
+        st.markdown(f"""
+        <div class="time-unit">
+            <div class="time-number">{minutes:02d}</div>
+            <div class="time-label">Minutes</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with countdown_col4:
+        st.markdown(f"""
+        <div class="time-unit">
+            <div class="time-number">{seconds:02d}</div>
+            <div class="time-label">Seconds</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-with countdown_col1:
-    st.markdown(f"""
-    <div class="time-unit">
-        <div class="time-number">{days}</div>
-        <div class="time-label">Days</div>
-    </div>
-    """, unsafe_allow_html=True)
+# Display initial countdown
+display_countdown()
 
-with countdown_col2:
-    st.markdown(f"""
-    <div class="time-unit">
-        <div class="time-number">{hours:02d}</div>
-        <div class="time-label">Hours</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with countdown_col3:
-    st.markdown(f"""
-    <div class="time-unit">
-        <div class="time-number">{minutes:02d}</div>
-        <div class="time-label">Minutes</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with countdown_col4:
-    st.markdown(f"""
-    <div class="time-unit">
-        <div class="time-number">{seconds:02d}</div>
-        <div class="time-label">Seconds</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# Auto-refresh every second using JavaScript
+# Client-side countdown using JavaScript - updates DOM directly
 st.markdown("""
 <script>
-    // Auto-refresh page every second for real-time countdown
-    setInterval(function() {
-        location.reload();
-    }, 1000);
+    function updateCountdown() {
+        const wibTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' });
+        const now = new Date(wibTime);
+        let targetDate = new Date('2026-01-08T00:00:00');
+        
+        const timeDiff = targetDate - now;
+        
+        if (timeDiff > 0) {
+            const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+            
+            // Update the countdown display
+            const timeUnits = document.querySelectorAll('.time-unit');
+            if (timeUnits.length >= 4) {
+                timeUnits[0].querySelector('.time-number').textContent = days;
+                timeUnits[1].querySelector('.time-number').textContent = String(hours).padStart(2, '0');
+                timeUnits[2].querySelector('.time-number').textContent = String(minutes).padStart(2, '0');
+                timeUnits[3].querySelector('.time-number').textContent = String(seconds).padStart(2, '0');
+            }
+        }
+    }
+    
+    // Update countdown every second
+    setInterval(updateCountdown, 1000);
+    // Initial update
+    updateCountdown();
 </script>
 """, unsafe_allow_html=True)
 
