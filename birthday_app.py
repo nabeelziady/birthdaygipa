@@ -197,6 +197,142 @@ pink_theme = """
         font-family: 'Playfair Display', serif;
         font-size: 1.3em;
     }
+    
+    /* Mobile responsive styles */
+    @media (max-width: 768px) {
+        .main-title {
+            font-size: 2.5em;
+            margin: 20px 10px;
+            letter-spacing: 0px;
+        }
+        
+        .countdown-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        
+        .time-unit {
+            padding: 15px;
+            min-width: 70px;
+        }
+        
+        .time-number {
+            font-size: 1.8em;
+        }
+        
+        .time-label {
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .section-header {
+            font-size: 1.8em;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+        
+        .special-box {
+            padding: 40px 20px;
+            min-height: 200px;
+            margin-bottom: 30px;
+        }
+        
+        .special-box h2 {
+            font-size: 1.4em;
+            word-wrap: break-word;
+        }
+        
+        .wish-card {
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .wish-card p {
+            font-size: 0.95em;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        button {
+            padding: 10px 20px !important;
+            font-size: 0.95em !important;
+        }
+        
+        .footer {
+            padding: 25px 15px;
+            font-size: 1em;
+        }
+        
+        .stApp {
+            padding: 0 10px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .main-title {
+            font-size: 1.8em;
+            margin: 15px 5px;
+        }
+        
+        .countdown-title {
+            font-size: 1.2em;
+        }
+        
+        .time-unit {
+            padding: 12px;
+            min-width: 60px;
+        }
+        
+        .time-number {
+            font-size: 1.5em;
+        }
+        
+        .time-label {
+            font-size: 0.75em;
+        }
+        
+        .section-header {
+            font-size: 1.5em;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            padding: 8px;
+            border-bottom: 2px solid #ff69b4;
+        }
+        
+        .special-box {
+            padding: 30px 15px;
+            min-height: 150px;
+        }
+        
+        .special-box h2 {
+            font-size: 1.2em;
+        }
+        
+        .wish-card {
+            padding: 12px;
+            margin: 8px 0;
+            border-left: 3px solid #ff69b4;
+        }
+        
+        .wish-card p {
+            font-size: 0.9em;
+        }
+        
+        button {
+            padding: 8px 16px !important;
+            font-size: 0.9em !important;
+        }
+        
+        .footer {
+            padding: 20px 10px;
+            font-size: 0.95em;
+        }
+        
+        .stApp {
+            padding: 0 5px;
+        }
+    }
 </style>
 """
 
