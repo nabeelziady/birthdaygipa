@@ -6,9 +6,6 @@ import math
 import pytz
 from streamlit_autorefresh import st_autorefresh
 
-# Refresh page every 1000 ms (1 second)
-st_autorefresh(interval=1000, key="countdown_refresh")
-
 # Set page config
 st.set_page_config(
     page_title="🎂 Happy Birthday! 🎂",
@@ -16,6 +13,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
+
+# Refresh page every 1000 ms (1 second)
+st_autorefresh(interval=1000, key="countdown_refresh")
 
 # Initialize session state for wishes
 if 'wishes' not in st.session_state:
