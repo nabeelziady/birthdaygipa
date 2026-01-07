@@ -1,8 +1,9 @@
 import streamlit as st
 import datetime
 import time
-from datetime import datetime as dt
+from datetime import datetime as dt, timezone, timedelta
 import math
+import pytz
 
 # Set page config
 st.set_page_config(
@@ -152,8 +153,7 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.markdown("""
     <div class="main-title">
-        🎉 Happy Birthday 🎉<br>
-        <span style="font-size: 0.7em;">To My Love ❤️</span>
+        🎉 Happy Birthday To My Love ❤️ 🎉
     </div>
     """, unsafe_allow_html=True)
 
@@ -161,12 +161,14 @@ with col2:
 placeholder = st.empty()
 
 def get_countdown():
-    target_date = dt(2026, 1, 8, 0, 0, 0)
-    now = dt.now()
+    # Set timezone to WIB (Jakarta)
+    wib = pytz.timezone('Asia/Jakarta')
+    target_date = wib.localize(dt(2026, 1, 8, 0, 0, 0))
+    now = dt.now(wib)
     
     # If birthday has passed, reset to next year
     if now >= target_date:
-        target_date = dt(2027, 1, 8, 0, 0, 0)
+        target_date = wib.localize(dt(2027, 1, 8, 0, 0, 0))
     
     time_diff = target_date - now
     
@@ -180,49 +182,81 @@ def get_countdown():
 # Countdown Timer with real-time refresh
 st.markdown('<div class="countdown-title">⏰ Countdown to Your Special Day ⏰</div>', unsafe_allow_html=True)
 
-days, hours, minutes, seconds = get_countdown()
+# Create a placeholder for countdown
+countdown_placeholder = st.empty()
 
-# Create countdown display
-countdown_col1, countdown_col2, countdown_col3, countdown_col4 = st.columns(4)
+def display_countdown():
+    days, hours, minutes, seconds = get_countdown()
+    
+    with countdown_placeholder.container():
+        countdown_col1, countdown_col2, countdown_col3, countdown_col4 = st.columns(4)
+        
+        with countdown_col1:
+            st.markdown(f"""
+            <div class="time-unit">
+                <div class="time-number">{days}</div>
+                <div class="time-label">Days</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with countdown_col2:
+            st.markdown(f"""
+            <div class="time-unit">
+                <div class="time-number">{hours:02d}</div>
+                <div class="time-label">Hours</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with countdown_col3:
+            st.markdown(f"""
+            <div class="time-unit">
+                <div class="time-number">{minutes:02d}</div>
+                <div class="time-label">Minutes</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with countdown_col4:
+            st.markdown(f"""
+            <div class="time-unit">
+                <div class="time-number">{seconds:02d}</div>
+                <div class="time-label">Seconds</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-with countdown_col1:
-    st.markdown(f"""
-    <div class="time-unit">
-        <div class="time-number">{days}</div>
-        <div class="time-label">Days</div>
-    </div>
-    """, unsafe_allow_html=True)
+# Display initial countdown
+display_countdown()
 
-with countdown_col2:
-    st.markdown(f"""
-    <div class="time-unit">
-        <div class="time-number">{hours:02d}</div>
-        <div class="time-label">Hours</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with countdown_col3:
-    st.markdown(f"""
-    <div class="time-unit">
-        <div class="time-number">{minutes:02d}</div>
-        <div class="time-label">Minutes</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with countdown_col4:
-    st.markdown(f"""
-    <div class="time-unit">
-        <div class="time-number">{seconds:02d}</div>
-        <div class="time-label">Seconds</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# Auto-refresh the page every second
+# JavaScript untuk auto-refresh tanpa full page reload
 st.markdown("""
 <script>
-    setTimeout(function() {
-        window.location.reload();
-    }, 1000);
+    let lastSeconds = null;
+    
+    function updateCountdown() {
+        const now = new Date();
+        const targetDate = new Date('2026-01-08T00:00:00+07:00');
+        
+        if (now >= targetDate) {
+            targetDate = new Date('2027-01-08T00:00:00+07:00');
+        }
+        
+        const timeDiff = targetDate - now;
+        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeDiff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((timeDiff / 1000 / 60) % 60);
+        const seconds = Math.floor((timeDiff / 1000) % 60);
+        
+        // Only reload if seconds changed significantly
+        if (lastSeconds !== seconds) {
+            lastSeconds = seconds;
+            // Reload page every 1 second for real-time update
+            if (seconds % 1 === 0) {
+                // This will auto-refresh the Streamlit app
+                window.location.reload();
+            }
+        }
+    }
+    
+    setInterval(updateCountdown, 1000);
 </script>
 """, unsafe_allow_html=True)
 
@@ -279,8 +313,12 @@ with col2:
     submit_wish = st.button("💖 Send Wish", use_container_width=True, key="submit_wish")
 
 if submit_wish and wish_message:
+    # Add wish to session state
+    st.session_state.wishes.append(wish_message)
     st.success("🎉 Your wish has been sent with love! 💕")
     st.balloons()
+    # Clear the input
+    st.session_state.wish_input = ""
 
 # Display wishes
 st.markdown("<br>", unsafe_allow_html=True)
