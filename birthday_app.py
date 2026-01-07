@@ -212,6 +212,22 @@ st.markdown("""
 
 st.markdown("<br>", unsafe_allow_html=True)
 
+# Large empty box for special section
+st.markdown("""
+<div style="background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%); 
+            border: 3px solid #ff69b4; 
+            border-radius: 20px; 
+            padding: 60px 40px; 
+            text-align: center; 
+            min-height: 250px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;">
+    <h2 style="color: #ffb6d9; font-size: 1.5em;">✨ Special Space For You ✨</h2>
+</div>
+""", unsafe_allow_html=True)
+
 # Section: Birthday Wishes Wall
 st.markdown('<div class="section-header">💌 Birthday Wishes Wall 💌</div>', unsafe_allow_html=True)
 
