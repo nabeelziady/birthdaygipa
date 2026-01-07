@@ -7,7 +7,7 @@ import pytz
 
 # Set page config - HARUS DI AWAL
 st.set_page_config(
-    page_title="🎂 Happy Birthday! 🎂",
+    page_title="🎂 Happy Birthday Buyub! 🎂",
     page_icon="🎉",
     layout="wide",
     initial_sidebar_state="collapsed"
