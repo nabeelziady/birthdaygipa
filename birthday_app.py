@@ -318,14 +318,12 @@ st.markdown('<div class="section-header">💌 Birthday Wishes Wall 💌</div>', 
 col1, col2 = st.columns([2, 1])
 
 with col1:
-    st.markdown('<div class="wish-input-section">', unsafe_allow_html=True)
     wish_message = st.text_area(
         "✍️ Write your birthday wish:",
         placeholder="Share your love and heartfelt message here...",
         height=100,
         key="wish_input"
     )
-    st.markdown('</div>', unsafe_allow_html=True)
 
 with col2:
     st.markdown("<br>", unsafe_allow_html=True)
