@@ -17,6 +17,9 @@ st.set_page_config(
 if 'wishes' not in st.session_state:
     st.session_state.wishes = []
 
+if 'gallery_images' not in st.session_state:
+    st.session_state.gallery_images = []
+
 # Custom CSS with pink theme
 pink_theme = """
 <style>
@@ -182,81 +185,50 @@ def get_countdown():
 # Countdown Timer with real-time refresh
 st.markdown('<div class="countdown-title">⏰ Countdown to Your Special Day ⏰</div>', unsafe_allow_html=True)
 
-# Create a placeholder for countdown
-countdown_placeholder = st.empty()
+# Display countdown with auto-refresh using Streamlit's built-in rerun
+days, hours, minutes, seconds = get_countdown()
 
-def display_countdown():
-    days, hours, minutes, seconds = get_countdown()
-    
-    with countdown_placeholder.container():
-        countdown_col1, countdown_col2, countdown_col3, countdown_col4 = st.columns(4)
-        
-        with countdown_col1:
-            st.markdown(f"""
-            <div class="time-unit">
-                <div class="time-number">{days}</div>
-                <div class="time-label">Days</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with countdown_col2:
-            st.markdown(f"""
-            <div class="time-unit">
-                <div class="time-number">{hours:02d}</div>
-                <div class="time-label">Hours</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with countdown_col3:
-            st.markdown(f"""
-            <div class="time-unit">
-                <div class="time-number">{minutes:02d}</div>
-                <div class="time-label">Minutes</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with countdown_col4:
-            st.markdown(f"""
-            <div class="time-unit">
-                <div class="time-number">{seconds:02d}</div>
-                <div class="time-label">Seconds</div>
-            </div>
-            """, unsafe_allow_html=True)
+countdown_col1, countdown_col2, countdown_col3, countdown_col4 = st.columns(4)
 
-# Display initial countdown
-display_countdown()
+with countdown_col1:
+    st.markdown(f"""
+    <div class="time-unit">
+        <div class="time-number">{days}</div>
+        <div class="time-label">Days</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-# JavaScript untuk auto-refresh tanpa full page reload
+with countdown_col2:
+    st.markdown(f"""
+    <div class="time-unit">
+        <div class="time-number">{hours:02d}</div>
+        <div class="time-label">Hours</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with countdown_col3:
+    st.markdown(f"""
+    <div class="time-unit">
+        <div class="time-number">{minutes:02d}</div>
+        <div class="time-label">Minutes</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with countdown_col4:
+    st.markdown(f"""
+    <div class="time-unit">
+        <div class="time-number">{seconds:02d}</div>
+        <div class="time-label">Seconds</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Auto-refresh every second using JavaScript
 st.markdown("""
 <script>
-    let lastSeconds = null;
-    
-    function updateCountdown() {
-        const now = new Date();
-        const targetDate = new Date('2026-01-08T00:00:00+07:00');
-        
-        if (now >= targetDate) {
-            targetDate = new Date('2027-01-08T00:00:00+07:00');
-        }
-        
-        const timeDiff = targetDate - now;
-        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((timeDiff / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((timeDiff / 1000 / 60) % 60);
-        const seconds = Math.floor((timeDiff / 1000) % 60);
-        
-        // Only reload if seconds changed significantly
-        if (lastSeconds !== seconds) {
-            lastSeconds = seconds;
-            // Reload page every 1 second for real-time update
-            if (seconds % 1 === 0) {
-                // This will auto-refresh the Streamlit app
-                window.location.reload();
-            }
-        }
-    }
-    
-    setInterval(updateCountdown, 1000);
+    const refreshCountdown = setInterval(function() {
+        // Refresh the page every second
+        location.reload();
+    }, 1000);
 </script>
 """, unsafe_allow_html=True)
 
@@ -291,7 +263,35 @@ uploaded_files = st.file_uploader(
 )
 
 if uploaded_files:
+    for uploaded_file in uploaded_files:
+        if uploaded_file not in st.session_state.gallery_images:
+            st.session_state.gallery_images.append(uploaded_file)
     st.success(f"✅ {len(uploaded_files)} photo(s) uploaded to the gallery!")
+
+# Display gallery images
+if st.session_state.gallery_images:
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%); 
+                border: 3px solid #ff69b4; border-radius: 15px; 
+                padding: 20px; text-align: center; min-height: 300px;">
+        <h3 style="color: #ff1493; margin-bottom: 20px;">📷 Photo Gallery</h3>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Display images in gallery
+    cols = st.columns(min(3, len(st.session_state.gallery_images)))
+    for idx, image_file in enumerate(st.session_state.gallery_images):
+        with cols[idx % len(cols)]:
+            st.image(image_file, use_column_width=True)
+else:
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%); 
+                border: 3px dashed #ff69b4; border-radius: 15px; 
+                padding: 40px; text-align: center; min-height: 300px;">
+        <h3 style="color: #ff1493; margin-bottom: 20px;">📷 Photo Gallery</h3>
+        <p style="color: #ff69b4; font-size: 1.1em;">📸 Upload your favorite photos here!</p>
+    </div>
+    """, unsafe_allow_html=True)
     
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -317,8 +317,8 @@ if submit_wish and wish_message:
     st.session_state.wishes.append(wish_message)
     st.success("🎉 Your wish has been sent with love! 💕")
     st.balloons()
-    # Clear the input
-    st.session_state.wish_input = ""
+    # Rerun to clear input
+    st.rerun()
 
 # Display wishes
 st.markdown("<br>", unsafe_allow_html=True)
