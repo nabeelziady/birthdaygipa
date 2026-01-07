@@ -1,14 +1,11 @@
 import streamlit as st
 import datetime
-import time
-from datetime import datetime as dt, timezone, timedelta
-import math
-import pytz
-from streamlit_autorefresh import st_autorefresh
+from datetime import datetime as dt
 import json
 import os
+import pytz
 
-# Set page config
+# Set page config - HARUS DI AWAL
 st.set_page_config(
     page_title="🎂 Happy Birthday! 🎂",
     page_icon="🎉",
@@ -16,34 +13,27 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Refresh page every 1000 ms (1 second)
-st_autorefresh(interval=1000, key="countdown_refresh")
+# Database file path
+DB_FILE = "wishes_database.json"
 
-# Database file untuk menyimpan wishes
-WISHES_DB_FILE = "wishes_database.json"
-
-def load_wishes_from_db():
-    """Load wishes dari database file"""
-    if os.path.exists(WISHES_DB_FILE):
+# Function to load wishes from database
+def load_wishes():
+    if os.path.exists(DB_FILE):
         try:
-            with open(WISHES_DB_FILE, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-                return data.get('wishes', [])
+            with open(DB_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
         except:
             return []
     return []
 
-def save_wishes_to_db(wishes):
-    """Save wishes ke database file"""
-    try:
-        with open(WISHES_DB_FILE, 'w', encoding='utf-8') as f:
-            json.dump({'wishes': wishes}, f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        st.error(f"Error saving wishes: {e}")
+# Function to save wishes to database
+def save_wishes(wishes):
+    with open(DB_FILE, 'w', encoding='utf-8') as f:
+        json.dump(wishes, f, ensure_ascii=False, indent=2)
 
-# Initialize session state for wishes from database
+# Initialize session state with wishes from database
 if 'wishes' not in st.session_state:
-    st.session_state.wishes = load_wishes_from_db()
+    st.session_state.wishes = load_wishes()
 
 # Custom CSS with pink theme
 pink_theme = """
@@ -78,30 +68,11 @@ pink_theme = """
         margin: 20px 0;
     }
     
-    .countdown-container {
-        background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%);
-        border: 3px solid #ff1493;
-        border-radius: 20px;
-        padding: 30px;
-        margin: 20px auto;
-        max-width: 800px;
-        box-shadow: 0 10px 40px rgba(255, 105, 180, 0.3);
-        text-align: center;
-    }
-    
     .countdown-title {
         color: #ff1493;
         font-size: 1.8em;
         font-weight: bold;
         margin-bottom: 15px;
-    }
-    
-    .countdown-time {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        flex-wrap: wrap;
-        margin: 20px 0;
     }
     
     .time-unit {
@@ -123,40 +94,6 @@ pink_theme = """
         margin-top: 5px;
     }
     
-    .feature-card {
-        background: white;
-        border-left: 5px solid #ff69b4;
-        padding: 20px;
-        margin: 15px 0;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(255, 105, 180, 0.2);
-    }
-    
-    .feature-title {
-        color: #ff1493;
-        font-size: 1.3em;
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
-    
-    .heart {
-        color: #ff1493;
-        animation: heartbeat 1.2s infinite;
-    }
-    
-    @keyframes heartbeat {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.2); }
-    }
-    
-    .confetti {
-        position: fixed;
-        width: 10px;
-        height: 10px;
-        pointer-events: none;
-        z-index: 9999;
-    }
-    
     .section-header {
         color: #ff1493;
         font-size: 2em;
@@ -172,21 +109,16 @@ pink_theme = """
 
 st.markdown(pink_theme, unsafe_allow_html=True)
 
-# Initialize session state
-if 'confetti_active' not in st.session_state:
-    st.session_state.confetti_active = False
-
-# Main Title with animation
+# Main Title
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.markdown("""
     <div class="main-title">
-        🎉 Happy Birthday Buyub! ❤️ 🎉
+        🎉 Happy Birthday To My Love ❤️ 🎉
     </div>
     """, unsafe_allow_html=True)
 
-# Auto-refresh the page every second for real-time countdown
-placeholder = st.empty()
+st.markdown('<div class="countdown-title">⏰ Countdown to Your Special Day ⏰</div>', unsafe_allow_html=True)
 
 def get_countdown():
     # Set timezone to WIB (Jakarta)
@@ -207,51 +139,42 @@ def get_countdown():
     
     return days, hours, minutes, seconds
 
-# Countdown Timer with real-time refresh
-st.markdown('<div class="countdown-title">⏰ Countdown to Your Special Day ⏰</div>', unsafe_allow_html=True)
+# Display countdown
+days, hours, minutes, seconds = get_countdown()
 
-# Create placeholders for countdown display
-countdown_placeholder = st.empty()
+countdown_col1, countdown_col2, countdown_col3, countdown_col4 = st.columns(4)
 
-def display_countdown():
-    days, hours, minutes, seconds = get_countdown()
-    
-    countdown_col1, countdown_col2, countdown_col3, countdown_col4 = st.columns(4)
-    
-    with countdown_col1:
-        st.markdown(f"""
-        <div class="time-unit">
-            <div class="time-number">{days}</div>
-            <div class="time-label">Days</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with countdown_col2:
-        st.markdown(f"""
-        <div class="time-unit">
-            <div class="time-number">{hours:02d}</div>
-            <div class="time-label">Hours</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with countdown_col3:
-        st.markdown(f"""
-        <div class="time-unit">
-            <div class="time-number">{minutes:02d}</div>
-            <div class="time-label">Minutes</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with countdown_col4:
-        st.markdown(f"""
-        <div class="time-unit">
-            <div class="time-number">{seconds:02d}</div>
-            <div class="time-label">Seconds</div>
-        </div>
-        """, unsafe_allow_html=True)
+with countdown_col1:
+    st.markdown(f"""
+    <div class="time-unit">
+        <div class="time-number">{days}</div>
+        <div class="time-label">Days</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-# Display initial countdown
-display_countdown()
+with countdown_col2:
+    st.markdown(f"""
+    <div class="time-unit">
+        <div class="time-number">{hours:02d}</div>
+        <div class="time-label">Hours</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with countdown_col3:
+    st.markdown(f"""
+    <div class="time-unit">
+        <div class="time-number">{minutes:02d}</div>
+        <div class="time-label">Minutes</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with countdown_col4:
+    st.markdown(f"""
+    <div class="time-unit">
+        <div class="time-number">{seconds:02d}</div>
+        <div class="time-label">Seconds</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # Client-side countdown using JavaScript - updates DOM directly
 st.markdown("""
@@ -289,60 +212,6 @@ st.markdown("""
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Section: Special Features - Gallery Only
-st.markdown('<div class="section-header">✨ Memory Gallery ✨</div>', unsafe_allow_html=True)
-
-st.markdown("""
-<div class="feature-card" style="text-align: center;">
-    <div class="feature-title">� Our Beautiful Memories �</div>
-    <p style="color: #666; margin-bottom: 20px;">Share and view our precious moments together!</p>
-</div>
-""", unsafe_allow_html=True)
-
-# Image upload option
-uploaded_files = st.file_uploader(
-    "Upload photos to the gallery",
-    type=['jpg', 'jpeg', 'png', 'gif'],
-    accept_multiple_files=True,
-    key="gallery_upload"
-)
-
-if uploaded_files:
-    for uploaded_file in uploaded_files:
-        if uploaded_file not in st.session_state.gallery_images:
-            st.session_state.gallery_images.append(uploaded_file)
-    st.success(f"✅ {len(uploaded_files)} photo(s) uploaded to the gallery!")
-
-# Display gallery images in a single container
-gallery_container = st.container()
-
-with gallery_container:
-    if st.session_state.gallery_images:
-        st.markdown("""
-        <div style="background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%); 
-                    border: 3px solid #ff69b4; border-radius: 15px; 
-                    padding: 20px; text-align: center; margin-bottom: 20px;">
-            <h3 style="color: #ff1493; margin-bottom: 20px;">📷 Photo Gallery</h3>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Display images in gallery in 3 columns
-        cols = st.columns(min(3, len(st.session_state.gallery_images)))
-        for idx, image_file in enumerate(st.session_state.gallery_images):
-            with cols[idx % len(cols)]:
-                st.image(image_file, use_column_width=True)
-    else:
-        st.markdown("""
-        <div style="background: linear-gradient(135deg, #fff0f5 0%, #ffe4f0 100%); 
-                    border: 3px dashed #ff69b4; border-radius: 15px; 
-                    padding: 40px; text-align: center; min-height: 300px;">
-            <h3 style="color: #ff1493; margin-bottom: 20px;">📷 Photo Gallery</h3>
-            <p style="color: #ff69b4; font-size: 1.1em;">📸 Upload your favorite photos here!</p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-st.markdown("<br>", unsafe_allow_html=True)
-
 # Section: Birthday Wishes Wall
 st.markdown('<div class="section-header">💌 Birthday Wishes Wall 💌</div>', unsafe_allow_html=True)
 
@@ -363,9 +232,11 @@ with col2:
 if submit_wish and wish_message:
     # Add wish to session state
     st.session_state.wishes.append(wish_message)
+    # Save to database
+    save_wishes(st.session_state.wishes)
     st.success("🎉 Your wish has been sent with love! 💕")
     st.balloons()
-    # Rerun to clear input
+    # Clear input by rerunning
     st.rerun()
 
 # Display wishes
